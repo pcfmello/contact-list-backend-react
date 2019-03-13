@@ -5,6 +5,6 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-require("./app/controllers")(app); // Repassando o app para as rotas
+require("./app/controllers")(app);
 
 app.listen(3000);

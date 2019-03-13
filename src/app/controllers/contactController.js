@@ -53,25 +53,41 @@ router.post("/", async (req, res) => {
     await contact.save();
     return res.send({ contact });
   } catch (err) {
-    console.log(err.stack)
+    console.log(err.stack);
     return res.status(400).send({ Error: "Error creating new projetct" });
   }
 });
 
 router.put("/:contactId", async (req, res) => {
   try {
-    const { name, cpf, phoneNumber } = req.body;
+    const { name, cpf, phoneNumbers } = req.body;
 
     const contact = await Contact.findByIdAndUpdate(
       req.params.contactId,
       {
         name,
-        cpf,
-        phoneNumber,
+        cpf
       },
       { new: true }
     );
 
+    contact.phoneNumbers = [];
+    await PhoneNumber.remove({ contact: contact._id });
+
+    await Promise.all(
+      phoneNumbers.map(async phone => {
+        const contactPhoneNumber = new PhoneNumber({
+          ...phone,
+          assignedTo: contact.user._id,
+          contact: contact._id
+        });
+
+        await contactPhoneNumber.save();
+        contact.phoneNumbers.push(contactPhoneNumber);
+      })
+    );
+
+    await contact.save();
     return res.send({ contact });
   } catch (err) {
     return res.status(400).send({ Error: "Error updating new projetct" });
@@ -80,7 +96,10 @@ router.put("/:contactId", async (req, res) => {
 
 router.delete("/:contactId", async (req, res) => {
   try {
-    const contact = await Contact.findByIdAndRemove(req.params.contactId);
+    const contact = await Contact.findById(req.params.contactId);
+    await PhoneNumber.remove({ contact: contact._id });
+    await Contact.deleteOne(contact);
+
     return res.send();
   } catch (err) {
     return res.status(400).send({ Error: "Error deleting new projetct" });
