@@ -8,7 +8,9 @@ router.use(authMiddleware);
 
 router.get("/", async (req, res) => {
   try {
-    const contacts = await Contact.find().populate(["user"]);
+    const contacts = await Contact.find({ user: req.userId })
+      .sort({ name: 1 })
+      .select({ name: 1 });
     return res.send({ contacts });
   } catch (error) {
     return res.status(400).send({ Error: "Error loading contacts" });
@@ -18,8 +20,8 @@ router.get("/", async (req, res) => {
 router.get("/:contactId", async (req, res) => {
   try {
     const contact = await Contact.findById(req.params.contactId)
-      .populate("user")
-      .populate("phoneNumbers", "number");
+      .select({ name: 1, cpf: 1, phoneNumbers: 1 })
+      .populate({ path: "phoneNumbers", select: "number" });
     return res.send({ contact });
   } catch (error) {
     return res.status(400).send({ Error: "Error loading contact" });
@@ -50,7 +52,7 @@ router.post("/", async (req, res) => {
     );
 
     await contact.save();
-    return res.send({ contact });
+    return res.status(201).send({ Message: "Contact saved" });
   } catch (err) {
     console.log(err.stack);
     return res.status(400).send({ Error: "Error creating new projetct" });
@@ -87,7 +89,7 @@ router.put("/:contactId", async (req, res) => {
     );
 
     await contact.save();
-    return res.send({ contact });
+    return res.status(200).send({ Message: "Contact updated" });
   } catch (err) {
     return res.status(400).send({ Error: "Error updating new projetct" });
   }
@@ -99,7 +101,7 @@ router.delete("/:contactId", async (req, res) => {
     await PhoneNumber.remove({ contact: contact._id });
     await Contact.deleteOne(contact);
 
-    return res.send();
+    return res.status(200).send({ Message: "Contact deleted" });
   } catch (err) {
     return res.status(400).send({ Error: "Error deleting new projetct" });
   }
