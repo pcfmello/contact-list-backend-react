@@ -8,7 +8,7 @@ router.use(authMiddleware);
 
 router.get("/", async (req, res) => {
   try {
-    const contacts = await Contact.find().populate(["user", "phoneNumber"]);
+    const contacts = await Contact.find().populate(["user"]);
     return res.send({ contacts });
   } catch (error) {
     return res.status(400).send({ Error: "Error loading contacts" });
@@ -17,10 +17,9 @@ router.get("/", async (req, res) => {
 
 router.get("/:contactId", async (req, res) => {
   try {
-    const contact = await Contact.findById(req.params.contactId).populate([
-      "user",
-      "phoneNumber"
-    ]);
+    const contact = await Contact.findById(req.params.contactId)
+      .populate("user")
+      .populate("phoneNumbers", "number");
     return res.send({ contact });
   } catch (error) {
     return res.status(400).send({ Error: "Error loading contact" });
