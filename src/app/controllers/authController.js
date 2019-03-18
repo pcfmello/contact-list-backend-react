@@ -13,12 +13,12 @@ function generateToken(params = {}) {
   });
 }
 
-router.post("/register", async (req, res) => {
+router.post("/signup", async (req, res) => {
   try {
     const { email } = req.body;
 
     if (await User.findOne({ email }))
-      return res.status(400).send({ Error: "User is already exists" });
+      return res.status(400).send({ errorMessage: "User is already exists" });
 
     const user = await User.create(req.body);
 
@@ -26,19 +26,19 @@ router.post("/register", async (req, res) => {
   } catch (err) {
     return res
       .status(400)
-      .send({ Error: "Registration failed", stack: err.stack });
+      .send({ errorMessage: "Registration failed", stack: err.stack });
   }
 });
 
-router.post("/authenticate", async (req, res) => {
+router.post("/signin", async (req, res) => {
   const { email, password } = req.body;
 
   const user = await User.findOne({ email }).select("+password");
 
-  if (!user) return res.status(400).send({ Error: "User not found" });
+  if (!user) return res.status(400).send({ errorMessage: "User not found" });
 
   if (!(await bcrypt.compare(password, user.password)))
-    return res.status(400).send({ Error: "Invalid password" });
+    return res.status(400).send({ errorMessage: "Invalid password" });
 
   user.password = undefined;
 
