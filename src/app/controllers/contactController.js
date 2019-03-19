@@ -54,7 +54,6 @@ router.post("/", async (req, res) => {
     await contact.save();
     return res.status(201).send({ Message: "Contact saved" });
   } catch (err) {
-    console.log(err.stack);
     return res.status(400).send({ Error: "Error creating new projetct" });
   }
 });

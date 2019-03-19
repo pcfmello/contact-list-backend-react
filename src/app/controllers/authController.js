@@ -31,18 +31,25 @@ router.post("/signup", async (req, res) => {
 });
 
 router.post("/signin", async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  const user = await User.findOne({ email }).select("+password");
+    const user = await User.findOne({ email }).select("+password");
 
-  if (!user) return res.status(400).send({ errorMessage: "User not found" });
+    if (!user) return res.status(400).send({ errorMessage: "User not found" });
 
-  if (!(await bcrypt.compare(password, user.password)))
-    return res.status(400).send({ errorMessage: "Invalid password" });
+    if (!(await bcrypt.compare(password, user.password)))
+      return res.status(400).send({ errorMessage: "Invalid password" });
 
-  user.password = undefined;
+    user.password = undefined;
 
-  res.send({ user, token: generateToken({ id: user.id }) });
+    res.send({ user, token: generateToken({ id: user.id }) });
+  } catch (error) {
+    console.log(error.stack);
+    return res
+      .status(400)
+      .send({ errorMessage: "Login failed", stack: error.stack });
+  }
 });
 
 module.exports = app => app.use("/auth", router);
