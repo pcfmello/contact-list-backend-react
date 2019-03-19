@@ -11,7 +11,7 @@ It has been developed usinig:
 
 Install dependencies:
 
-`$ yarn install`
+`$ yarn`
 
 Start the server:
 
