@@ -1,5 +1,5 @@
 # CONTACT LIST BACKEND
-It's the backend application provides REST API using JWT Token to can use the CONTACT LIST FRONTEND application.
+It's the backend application provides REST API using JWT Token to use the CONTACT LIST FRONTEND application.
 
 It has been developed usinig:
 * NodeJS v10.15.3
